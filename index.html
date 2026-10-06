@@ -72,6 +72,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="loadTransactionsFromSheets()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700" title="Refresh Data Sheets">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
                     <button id="btnOpenModal" class="flex items-center gap-2 bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition shadow-sm hover:shadow-sky-900/20 active:scale-95">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">Tambah Transaksi</span>
@@ -122,7 +125,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-            <!-- Card Total Saldo (Ikon diubah ke wallet) -->
+            <!-- Card Total Saldo -->
             <div class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 border border-slate-700/80 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
                 <div class="absolute -right-4 -bottom-4 bg-sky-500/10 w-32 h-32 rounded-full blur-xl pointer-events-none"></div>
                 <div class="flex justify-between items-start mb-4">
@@ -344,12 +347,7 @@
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVpwe5aBw7obeJyhcSG4mQA2vqA9YSF5M-sLb0hfMR_G6hpBg_iBRmSUYSFnEDg8Px/exec';
 
         // State Transaksi & Filter
-        let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [
-            { id: 1, title: 'Gaji Bulanan', amount: 8500000, type: 'income', category: 'gaji', date: '2026-10-01' },
-            { id: 2, title: 'Makan Malam Resto', amount: 120000, type: 'expense', category: 'makanan', date: '2026-10-02' },
-            { id: 3, title: 'Langganan Internet', amount: 350000, type: 'expense', category: 'tagihan', date: '2026-10-03' },
-            { id: 4, title: 'Dividen Saham', amount: 450000, type: 'income', category: 'investasi', date: '2026-10-05' }
-        ];
+        let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
 
         let currentPeriodFilter = 'all';
         let financialChartInstance = null;
@@ -373,7 +371,25 @@
             setupEventListeners();
             initCharts();
             renderDashboard();
+            loadTransactionsFromSheets(); // Ambil data terbaru dari Google Sheets saat dibuka
         });
+
+        async function loadTransactionsFromSheets() {
+            showToast('Memuat data dari Google Sheets...');
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    transactions = data;
+                    saveTransactions();
+                    renderDashboard();
+                    showToast('Data berhasil disinkronkan!');
+                }
+            } catch (error) {
+                console.error("Gagal memuat dari Google Sheets:", error);
+                renderDashboard();
+            }
+        }
 
         function setupEventListeners() {
             const modal = document.getElementById('transactionModal');

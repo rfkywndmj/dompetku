@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DompetKu - Financial Hub</title>
+    <title>DompetKu - Dashboard Keuangan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -40,17 +40,24 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <button onclick="togglePrivacyMode()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700 flex items-center gap-1.5 text-xs font-semibold" title="Sembunyikan/Tampilkan Saldo">
+                    <button onclick="togglePrivacyMode()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700 flex items-center gap-1.5 text-xs font-semibold">
                         <i id="privacyIcon" data-lucide="eye-off" class="w-4 h-4 text-amber-400"></i>
                         <span class="hidden sm:inline" id="privacyText">Sensor Saldo</span>
                     </button>
                     <button onclick="loadTransactionsFromSheets()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700" title="Sinkronkan Data">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
-                    <button id="btnOpenModal" class="flex items-center gap-2 bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition shadow-sm active:scale-95">
+
+                    <!-- Modul Tombol Terpisah -->
+                    <button id="btnOpenTransferModal" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
+                        <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Transfer Dana</span>
+                    </button>
+                    <button id="btnOpenModal" class="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
                         <i data-lucide="plus" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">Tambah Transaksi</span>
                     </button>
+
                     <div class="relative group">
                         <button class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700">
                             <i data-lucide="more-vertical" class="w-5 h-5"></i>
@@ -68,49 +75,50 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
         
-        <!-- Filter Akun -->
+        <!-- Filter Akun & Filter Periode -->
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <!-- Filter Akun -->
             <div class="inline-flex p-1 bg-slate-800 border border-slate-700/80 rounded-2xl gap-1 overflow-x-auto max-w-full">
-                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap" data-account="all">Semua Akun</button>
-                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Mandiri</button>
-                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan2">Bank MAS</button>
-                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="investasi">Dana Investasi</button>
+                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap" data-account="all">Semua Akun</button>
+                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Mandiri</button>
+                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan2">Bank MAS</button>
+                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="investasi">Dana Investasi</button>
+            </div>
+
+            <!-- Filter Periode (Lengkap) -->
+            <div class="inline-flex p-1 bg-slate-800/80 border border-slate-700/60 rounded-2xl gap-1 text-xs font-semibold text-slate-400 overflow-x-auto max-w-full">
+                <button class="period-btn px-3 py-1.5 rounded-xl transition active-period bg-slate-700 text-white shadow-sm whitespace-nowrap" data-period="all">Semua</button>
+                <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="daily">Harian</button>
+                <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="weekly">Mingguan</button>
+                <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="monthly">Bulanan</button>
+                <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="yearly">Tahunan</button>
             </div>
         </div>
 
         <!-- Kartu Saldo Terpisah -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <!-- Saldo Mandiri -->
             <div class="bg-gradient-to-br from-slate-900 to-sky-950 border border-sky-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
                 <div class="flex justify-between items-start mb-2">
                     <span class="text-xs font-semibold text-sky-300">Mandiri</span>
-                    <div class="p-1.5 bg-sky-500/20 text-sky-400 rounded-lg">
-                        <i data-lucide="credit-card" class="w-4 h-4"></i>
-                    </div>
+                    <div class="p-1.5 bg-sky-500/20 text-sky-400 rounded-lg"><i data-lucide="credit-card" class="w-4 h-4"></i></div>
                 </div>
                 <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balMandiri">••••••••</div>
                 <span class="text-[11px] text-slate-400">Rekening Utama</span>
             </div>
 
-            <!-- Saldo Bank MAS -->
             <div class="bg-gradient-to-br from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
                 <div class="flex justify-between items-start mb-2">
                     <span class="text-xs font-semibold text-indigo-300">Bank MAS</span>
-                    <div class="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg">
-                        <i data-lucide="landmark" class="w-4 h-4"></i>
-                    </div>
+                    <div class="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg"><i data-lucide="landmark" class="w-4 h-4"></i></div>
                 </div>
                 <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balBankMAS">••••••••</div>
                 <span class="text-[11px] text-slate-400">Rekening Sekunder</span>
             </div>
 
-            <!-- Dana Investasi -->
             <div class="bg-gradient-to-br from-slate-900 to-emerald-950 border border-emerald-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
                 <div class="flex justify-between items-start mb-2">
                     <span class="text-xs font-semibold text-emerald-300">Dana Investasi</span>
-                    <div class="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg">
-                        <i data-lucide="trending-up" class="w-4 h-4"></i>
-                    </div>
+                    <div class="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
                 </div>
                 <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balInvestasi">••••••••</div>
                 <span class="text-[11px] text-slate-400">Portofolio Reksadana / Saham</span>
@@ -121,7 +129,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-medium text-slate-400">Total Pemasukan</span>
+                    <span class="text-xs font-medium text-slate-400">Total Pemasukan (Filter)</span>
                     <div class="text-xl font-bold text-white balance-field" data-value="0" id="totalIncome">••••••••</div>
                 </div>
                 <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="arrow-down-left" class="w-5 h-5"></i></div>
@@ -129,7 +137,7 @@
 
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-medium text-slate-400">Total Pengeluaran</span>
+                    <span class="text-xs font-medium text-slate-400">Total Pengeluaran (Filter)</span>
                     <div class="text-xl font-bold text-white balance-field" data-value="0" id="totalExpense">••••••••</div>
                 </div>
                 <div class="p-2 bg-rose-500/10 text-rose-400 rounded-xl"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
@@ -171,36 +179,31 @@
         </div>
     </main>
 
-    <!-- Modal Form Transaksi -->
+    <!-- MODUL 1: Modal Form Transaksi Biasa -->
     <div id="transactionModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-white">Tambah Transaksi / Pindah Saldo</h3>
+                <h3 class="font-bold text-white">Tambah Transaksi Baru</h3>
                 <button id="btnCloseModal" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
             <form id="transactionForm" class="space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Tipe Transaksi</label>
-                    <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-900 rounded-xl text-xs font-semibold">
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-xl text-xs font-semibold">
                         <label class="cursor-pointer">
-                            <input type="radio" name="type" value="income" class="peer hidden" checked onchange="toggleFormMode('income')">
+                            <input type="radio" name="type" value="income" class="peer hidden" checked>
                             <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-emerald-400">Pemasukan</div>
                         </label>
                         <label class="cursor-pointer">
-                            <input type="radio" name="type" value="expense" class="peer hidden" onchange="toggleFormMode('expense')">
+                            <input type="radio" name="type" value="expense" class="peer hidden">
                             <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-rose-400">Pengeluaran</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="type" value="transfer" class="peer hidden" onchange="toggleFormMode('transfer')">
-                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-sky-400">Transfer</div>
                         </label>
                     </div>
                 </div>
 
-                <!-- Input Sumber Akun Biasa -->
-                <div id="singleAccountContainer">
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Akun / Sumber Dana</label>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Akun</label>
                     <select id="txAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
                         <option value="tabungan1">Mandiri</option>
                         <option value="tabungan2">Bank MAS</option>
@@ -208,29 +211,9 @@
                     </select>
                 </div>
 
-                <!-- Input Pindah Saldo / Transfer -->
-                <div id="transferAccountContainer" class="hidden grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Dari Akun</label>
-                        <select id="txFromAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
-                            <option value="tabungan1">Mandiri</option>
-                            <option value="tabungan2">Bank MAS</option>
-                            <option value="investasi">Dana Investasi</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Ke Akun</label>
-                        <select id="txToAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
-                            <option value="tabungan2">Bank MAS</option>
-                            <option value="tabungan1">Mandiri</option>
-                            <option value="investasi">Dana Investasi</option>
-                        </select>
-                    </div>
-                </div>
-
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi</label>
-                    <input type="text" id="txTitle" required placeholder="Contoh: Beli Kopi, Transfer Saldo" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="text" id="txTitle" required placeholder="Contoh: Gaji Bulanan, Beli Makan" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
                 </div>
 
                 <div>
@@ -248,7 +231,6 @@
                             <option value="tagihan">Tagihan</option>
                             <option value="investasi">Investasi / Tabungan</option>
                             <option value="transportasi">Transportasi</option>
-                            <option value="transfer">Transfer Antar Akun</option>
                             <option value="lainnya">Lainnya</option>
                         </select>
                     </div>
@@ -266,6 +248,60 @@
         </div>
     </div>
 
+    <!-- MODUL 2: Modal Form Transfer / Pemindahan Dana (Terpisah Penuh) -->
+    <div id="transferModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <i data-lucide="arrow-left-right" class="w-4 h-4 text-indigo-400"></i>
+                    Pemindahan Dana Antar Akun
+                </h3>
+                <button id="btnCloseTransferModal" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form id="transferForm" class="space-y-3">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Dari Akun (Sumber)</label>
+                        <select id="tfFromAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-indigo-500">
+                            <option value="tabungan1">Mandiri</option>
+                            <option value="tabungan2">Bank MAS</option>
+                            <option value="investasi">Dana Investasi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Ke Akun (Tujuan)</label>
+                        <select id="tfToAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-indigo-500">
+                            <option value="tabungan2">Bank MAS</option>
+                            <option value="tabungan1">Mandiri</option>
+                            <option value="investasi">Dana Investasi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Catatan Pemindahan</label>
+                    <input type="text" id="tfTitle" placeholder="Contoh: Topup Investasi, Alokasi Bulanan" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nominal Transfer (Rp)</label>
+                    <input type="text" id="tfAmount" required placeholder="0" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Tanggal</label>
+                    <input type="date" id="tfDate" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" id="btnCancelTransferModal" class="px-4 py-2 border border-slate-700 rounded-xl text-xs text-slate-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold">Proses Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 border border-slate-700 text-white text-xs px-4 py-3 rounded-xl shadow-2xl translate-y-20 opacity-0 transition-all z-50">
         <span id="toastMessage">Notifikasi</span>
     </div>
@@ -275,33 +311,21 @@
 
         let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
         let currentAccountFilter = 'all';
+        let currentPeriodFilter = 'all';
         let isPrivacyMode = true;
         let financialChartInstance = null;
         let categoryChartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('txDate').value = todayStr;
+            document.getElementById('tfDate').value = todayStr;
             setupEventListeners();
             initCharts();
             renderDashboard();
             loadTransactionsFromSheets();
         });
-
-        function toggleFormMode(mode) {
-            const singleContainer = document.getElementById('singleAccountContainer');
-            const transferContainer = document.getElementById('transferAccountContainer');
-            const categorySelect = document.getElementById('txCategory');
-
-            if (mode === 'transfer') {
-                singleContainer.classList.add('hidden');
-                transferContainer.classList.remove('hidden');
-                categorySelect.value = 'transfer';
-            } else {
-                singleContainer.classList.remove('hidden');
-                transferContainer.classList.add('hidden');
-            }
-        }
 
         async function loadTransactionsFromSheets() {
             showToast('Menyinkronkan data...');
@@ -320,16 +344,27 @@
         }
 
         function setupEventListeners() {
-            const modal = document.getElementById('transactionModal');
-            document.getElementById('btnOpenModal').addEventListener('click', () => modal.classList.remove('invisible', 'opacity-0'));
-            document.getElementById('btnCloseModal').addEventListener('click', () => modal.classList.add('opacity-0', 'invisible'));
-            document.getElementById('btnCancelModal').addEventListener('click', () => modal.classList.add('opacity-0', 'invisible'));
+            // Modal Transaksi Biasa
+            const txModal = document.getElementById('transactionModal');
+            document.getElementById('btnOpenModal').addEventListener('click', () => txModal.classList.remove('invisible', 'opacity-0'));
+            document.getElementById('btnCloseModal').addEventListener('click', () => txModal.classList.add('opacity-0', 'invisible'));
+            document.getElementById('btnCancelModal').addEventListener('click', () => txModal.classList.add('opacity-0', 'invisible'));
 
-            document.getElementById('txAmount').addEventListener('input', (e) => {
-                let val = e.target.value.replace(/[^0-9]/g, '');
-                e.target.value = val ? parseInt(val, 10).toLocaleString('id-ID') : '';
+            // Modal Transfer Terpisah
+            const tfModal = document.getElementById('transferModal');
+            document.getElementById('btnOpenTransferModal').addEventListener('click', () => tfModal.classList.remove('invisible', 'opacity-0'));
+            document.getElementById('btnCloseTransferModal').addEventListener('click', () => tfModal.classList.add('opacity-0', 'invisible'));
+            document.getElementById('btnCancelTransferModal').addEventListener('click', () => tfModal.classList.add('opacity-0', 'invisible'));
+
+            // Format Ribuan Input
+            ['txAmount', 'tfAmount'].forEach(id => {
+                document.getElementById(id).addEventListener('input', (e) => {
+                    let val = e.target.value.replace(/[^0-9]/g, '');
+                    e.target.value = val ? parseInt(val, 10).toLocaleString('id-ID') : '';
+                });
             });
 
+            // Submit Transaksi Biasa
             document.getElementById('transactionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const title = document.getElementById('txTitle').value.trim();
@@ -337,39 +372,60 @@
                 const amount = parseFloat(rawAmount);
                 const type = document.querySelector('input[name="type"]:checked').value;
                 const category = document.getElementById('txCategory').value;
+                const account = document.getElementById('txAccount').value;
                 const date = document.getElementById('txDate').value;
 
                 if (!title || isNaN(amount) || amount <= 0) return;
 
-                let newTransactions = [];
-
-                if (type === 'transfer') {
-                    const fromAcc = document.getElementById('txFromAccount').value;
-                    const toAcc = document.getElementById('txToAccount').value;
-
-                    if (fromAcc === toAcc) {
-                        alert("Akun asal dan akun tujuan tidak boleh sama!");
-                        return;
-                    }
-
-                    // Transaksi 1: Pengeluaran dari Akun Asal
-                    const txOut = { id: Date.now(), date, title: `Transfer ke ${getAccountLabel(toAcc)} - ${title}`, category: 'transfer', type: 'expense', amount, account: fromAcc };
-                    // Transaksi 2: Pemasukan ke Akun Tujuan
-                    const txIn = { id: Date.now() + 1, date, title: `Transfer dari ${getAccountLabel(fromAcc)} - ${title}`, category: 'transfer', type: 'income', amount, account: toAcc };
-
-                    newTransactions.push(txOut, txIn);
-                } else {
-                    const account = document.getElementById('txAccount').value;
-                    newTransactions.push({ id: Date.now(), date, title, category, type, amount, account });
-                }
-
-                transactions.unshift(...newTransactions);
+                const newTx = { id: Date.now(), date, title, category, type, amount, account };
+                transactions.unshift(newTx);
                 saveTransactions();
                 renderDashboard();
-                modal.classList.add('opacity-0', 'invisible');
+                txModal.classList.add('opacity-0', 'invisible');
                 showToast('Menyimpan ke Sheets...');
 
-                for (const tx of newTransactions) {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(newTx)
+                    });
+                    showToast('Tersimpan di Google Sheets!');
+                } catch (err) { console.error(err); }
+
+                e.target.reset();
+                document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+            });
+
+            // Submit Modul Transfer Terpisah
+            document.getElementById('transferForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fromAcc = document.getElementById('tfFromAccount').value;
+                const toAcc = document.getElementById('tfToAccount').value;
+                const notes = document.getElementById('tfTitle').value.trim();
+                const rawAmount = document.getElementById('tfAmount').value.replace(/\./g, '');
+                const amount = parseFloat(rawAmount);
+                const date = document.getElementById('tfDate').value;
+
+                if (fromAcc === toAcc) {
+                    alert("Akun asal dan akun tujuan tidak boleh sama!");
+                    return;
+                }
+                if (isNaN(amount) || amount <= 0) return;
+
+                const noteStr = notes ? ` (${notes})` : '';
+                const txOut = { id: Date.now(), date, title: `Transfer ke ${getAccountLabel(toAcc)}${noteStr}`, category: 'transfer', type: 'expense', amount, account: fromAcc };
+                const txIn = { id: Date.now() + 1, date, title: `Transfer dari ${getAccountLabel(fromAcc)}${noteStr}`, category: 'transfer', type: 'income', amount, account: toAcc };
+
+                const newTxs = [txOut, txIn];
+                transactions.unshift(...newTxs);
+                saveTransactions();
+                renderDashboard();
+                tfModal.classList.add('opacity-0', 'invisible');
+                showToast('Memproses Transfer...');
+
+                for (const tx of newTxs) {
                     try {
                         await fetch(GOOGLE_SCRIPT_URL, {
                             method: 'POST',
@@ -377,23 +433,34 @@
                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                             body: JSON.stringify(tx)
                         });
-                    } catch (err) {
-                        console.error(err);
-                    }
+                    } catch (err) { console.error(err); }
                 }
-                showToast('Tersimpan di Google Sheets!');
+                showToast('Transfer Berhasil!');
 
                 e.target.reset();
-                toggleFormMode('income');
-                document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('tfDate').value = new Date().toISOString().split('T')[0];
             });
 
+            // Filter Tabungan Click
             document.querySelectorAll('.account-tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.account-tab-btn').forEach(b => b.classList.replace('bg-sky-600', 'text-slate-400'));
                     document.querySelectorAll('.account-tab-btn').forEach(b => b.classList.remove('text-white'));
                     e.target.classList.add('bg-sky-600', 'text-white');
                     currentAccountFilter = e.target.getAttribute('data-account');
+                    renderDashboard();
+                });
+            });
+
+            // Filter Periode Click
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('bg-slate-700', 'text-white', 'shadow-sm'));
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.add('hover:text-white'));
+                    e.target.classList.add('bg-slate-700', 'text-white', 'shadow-sm');
+                    e.target.classList.remove('hover:text-white');
+
+                    currentPeriodFilter = e.target.getAttribute('data-period');
                     renderDashboard();
                 });
             });
@@ -448,9 +515,28 @@
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
 
+        function filterByPeriod(data, period) {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+
+            return data.filter(tx => {
+                const txDate = new Date(tx.date);
+                if (period === 'daily') return tx.date === todayStr;
+                if (period === 'weekly') {
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(now.getDate() - 7);
+                    return txDate >= sevenDaysAgo && txDate <= now;
+                }
+                if (period === 'monthly') return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+                if (period === 'yearly') return txDate.getFullYear() === now.getFullYear();
+                return true;
+            });
+        }
+
         function renderDashboard() {
             let bal1 = 0, bal2 = 0, balInv = 0;
 
+            // Saldo Kumulatif Seluruh Akun
             transactions.forEach(tx => {
                 const acc = tx.account || 'tabungan1';
                 const delta = (tx.type === 'income' ? tx.amount : -tx.amount);
@@ -464,11 +550,14 @@
             document.getElementById('balBankMAS').setAttribute('data-value', bal2);
             document.getElementById('balInvestasi').setAttribute('data-value', balInv);
 
+            // Filter Berdasarkan Akun & Periode
             let filteredData = transactions.filter(tx => {
                 const acc = tx.account || 'tabungan1';
                 if (currentAccountFilter === 'all') return true;
                 return acc === currentAccountFilter;
             });
+
+            filteredData = filterByPeriod(filteredData, currentPeriodFilter);
 
             let income = 0, expense = 0;
             filteredData.forEach(tx => {

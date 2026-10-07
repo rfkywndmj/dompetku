@@ -37,10 +37,9 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0f172a; /* Slate 900 */
+            background-color: #0f172a;
             color: #f8fafc;
         }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -80,7 +79,6 @@
                         <span class="hidden sm:inline">Tambah Transaksi</span>
                     </button>
                     
-                    <!-- Dropdown Options -->
                     <div class="relative group">
                         <button class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700" title="Menu Opsi">
                             <i data-lucide="more-vertical" class="w-5 h-5"></i>
@@ -108,8 +106,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
-        
-        <!-- Filter Periode Global -->
         <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
                 <h2 class="text-xl font-bold text-white">Ringkasan Aktivitas</h2>
@@ -125,7 +121,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-            <!-- Card Total Saldo -->
             <div class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 border border-slate-700/80 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
                 <div class="absolute -right-4 -bottom-4 bg-sky-500/10 w-32 h-32 rounded-full blur-xl pointer-events-none"></div>
                 <div class="flex justify-between items-start mb-4">
@@ -138,7 +133,6 @@
                 <span class="text-xs text-slate-400 font-normal">Sisa saldo akumulasi bersih</span>
             </div>
 
-            <!-- Card Total Pemasukan -->
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 shadow-sm backdrop-blur-sm">
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-xs font-medium text-slate-400">Pemasukan</span>
@@ -152,7 +146,6 @@
                 </span>
             </div>
 
-            <!-- Card Total Pengeluaran -->
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 shadow-sm backdrop-blur-sm">
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-xs font-medium text-slate-400">Pengeluaran</span>
@@ -168,7 +161,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Bar Chart -->
             <div class="lg:col-span-2 bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 shadow-sm">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-white text-base">Visualisasi Arus Kas</h3>
@@ -179,7 +171,6 @@
                 </div>
             </div>
 
-            <!-- Category Breakdown Pie Chart -->
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 shadow-sm flex flex-col">
                 <h3 class="font-bold text-white text-base mb-4">Pengeluaran per Kategori</h3>
                 <div class="h-64 sm:h-72 w-full flex-1 flex items-center justify-center relative">
@@ -195,7 +186,6 @@
                     <p class="text-xs text-slate-400 mt-0.5" id="txCountLabel">0 transaksi ditemukan</p>
                 </div>
                 
-                <!-- Search & Filters -->
                 <div class="flex flex-wrap sm:flex-nowrap gap-2.5 w-full sm:w-auto">
                     <div class="relative flex-1 sm:w-56">
                         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -226,12 +216,10 @@
                         </tr>
                     </thead>
                     <tbody id="transactionList" class="divide-y divide-slate-700/50">
-                        <!-- Transaksi dimuat secara dinamis -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Empty State -->
             <div id="emptyState" class="hidden py-12 text-center">
                 <div class="inline-flex p-3 bg-slate-700/40 border border-slate-700 rounded-full text-slate-400 mb-3">
                     <i data-lucide="receipt" class="w-8 h-8"></i>
@@ -338,8 +326,8 @@
     </div>
 
     <script>
-        // MASUKKAN WEB APP URL BARU KAMU DI SINI
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7YECKcpFR5nWCktCy4AEcJSMUZdHgHxh307Dj6Eg_oj3jwfsBCaL0NGhw0Y1lmaCavQ/exec';
+        // URL Google Apps Script milikmu yang baru
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQH2hX25MWwZ8agrPik-5IFDASvGOh-dQvCWnPCcGvPjhr_hMOXnv7tYRo_m5WvFI4w/exec';
 
         let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
         let currentPeriodFilter = 'all';
@@ -367,7 +355,6 @@
             loadTransactionsFromSheets();
         });
 
-        // Ambil data dari Google Sheets
         async function loadTransactionsFromSheets() {
             showToast('Menyinkronkan data dari Google Sheets...');
             try {
@@ -412,7 +399,6 @@
                 e.target.value = val ? parseInt(val, 10).toLocaleString('id-ID') : '';
             });
 
-            // Submit Form Transaksi
             document.getElementById('transactionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const title = document.getElementById('txTitle').value.trim();
@@ -433,14 +419,12 @@
                     amount
                 };
 
-                // Update UI lokal
                 transactions.unshift(newTx);
                 saveTransactions();
                 renderDashboard();
                 closeModal();
                 showToast('Menyimpan ke Google Sheets...');
 
-                // Kirim payload persis ke Google Sheets
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
@@ -773,16 +757,29 @@
         function promptResetData() {
             openConfirmModal(
                 'Reset Semua Data',
-                'Apakah Anda yakin ingin menghapus SELURUH data transaksi di browser?',
+                'Apakah Anda yakin ingin menghapus SELURUH data transaksi di Google Sheets dan browser?',
                 resetData
             );
         }
 
-        function resetData() {
+        // Fungsi Reset yang sudah terintegrasi penuh dengan Apps Script
+        async function resetData() {
             transactions = [];
             saveTransactions();
             renderDashboard();
-            showToast('Seluruh data di browser berhasil dihapus.');
+            showToast('Menghapus semua data...');
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "reset" })
+                });
+                showToast('Seluruh data di Google Sheets berhasil dibersihkan!');
+            } catch (error) {
+                console.error("Gagal reset:", error);
+            }
         }
     </script>
 </body>

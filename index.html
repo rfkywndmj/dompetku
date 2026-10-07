@@ -326,8 +326,8 @@
     </div>
 
     <script>
-        // URL Google Apps Script milikmu yang baru
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQH2hX25MWwZ8agrPik-5IFDASvGOh-dQvCWnPCcGvPjhr_hMOXnv7tYRo_m5WvFI4w/exec';
+        // URL Google Apps Script yang Baru
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFUijxNFPkM4CZ_makpkdoD1oMmvOKi-_7XUsq6RmPwcI5lYxzs80P3jV-P8jQJ0J0Jw/exec';
 
         let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
         let currentPeriodFilter = 'all';
@@ -762,7 +762,6 @@
             );
         }
 
-        // Fungsi Reset yang sudah terintegrasi penuh dengan Apps Script
         async function resetData() {
             transactions = [];
             saveTransactions();

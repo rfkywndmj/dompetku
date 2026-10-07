@@ -344,19 +344,16 @@
         }
 
         function setupEventListeners() {
-            // Modal Transaksi Biasa
             const txModal = document.getElementById('transactionModal');
             document.getElementById('btnOpenModal').addEventListener('click', () => txModal.classList.remove('invisible', 'opacity-0'));
             document.getElementById('btnCloseModal').addEventListener('click', () => txModal.classList.add('opacity-0', 'invisible'));
             document.getElementById('btnCancelModal').addEventListener('click', () => txModal.classList.add('opacity-0', 'invisible'));
 
-            // Modal Transfer Terpisah
             const tfModal = document.getElementById('transferModal');
             document.getElementById('btnOpenTransferModal').addEventListener('click', () => tfModal.classList.remove('invisible', 'opacity-0'));
             document.getElementById('btnCloseTransferModal').addEventListener('click', () => tfModal.classList.add('opacity-0', 'invisible'));
             document.getElementById('btnCancelTransferModal').addEventListener('click', () => tfModal.classList.add('opacity-0', 'invisible'));
 
-            // Format Ribuan Input
             ['txAmount', 'tfAmount'].forEach(id => {
                 document.getElementById(id).addEventListener('input', (e) => {
                     let val = e.target.value.replace(/[^0-9]/g, '');
@@ -364,7 +361,6 @@
                 });
             });
 
-            // Submit Transaksi Biasa
             document.getElementById('transactionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const title = document.getElementById('txTitle').value.trim();
@@ -398,7 +394,6 @@
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             });
 
-            // Submit Modul Transfer Terpisah
             document.getElementById('transferForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const fromAcc = document.getElementById('tfFromAccount').value;
@@ -418,6 +413,7 @@
                 const txOut = { id: Date.now(), date, title: `Transfer ke ${getAccountLabel(toAcc)}${noteStr}`, category: 'transfer', type: 'expense', amount, account: fromAcc };
                 const txIn = { id: Date.now() + 1, date, title: `Transfer dari ${getAccountLabel(fromAcc)}${noteStr}`, category: 'transfer', type: 'income', amount, account: toAcc };
 
+                // Simpan sekaligus
                 const newTxs = [txOut, txIn];
                 transactions.unshift(...newTxs);
                 saveTransactions();
@@ -425,23 +421,21 @@
                 tfModal.classList.add('opacity-0', 'invisible');
                 showToast('Memproses Transfer...');
 
-                for (const tx of newTxs) {
-                    try {
-                        await fetch(GOOGLE_SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                            body: JSON.stringify(tx)
-                        });
-                    } catch (err) { console.error(err); }
-                }
-                showToast('Transfer Berhasil!');
+                try {
+                    // Kirim sebagai ARRAY (Sangat efisien & Anti-gagal)
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(newTxs) 
+                    });
+                    showToast('Transfer Berhasil Disimpan!');
+                } catch (err) { console.error(err); }
 
                 e.target.reset();
                 document.getElementById('tfDate').value = new Date().toISOString().split('T')[0];
             });
 
-            // Filter Tabungan Click
             document.querySelectorAll('.account-tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.account-tab-btn').forEach(b => b.classList.replace('bg-sky-600', 'text-slate-400'));
@@ -452,7 +446,6 @@
                 });
             });
 
-            // Filter Periode Click
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('bg-slate-700', 'text-white', 'shadow-sm'));
@@ -536,7 +529,6 @@
         function renderDashboard() {
             let bal1 = 0, bal2 = 0, balInv = 0;
 
-            // Saldo Kumulatif Seluruh Akun
             transactions.forEach(tx => {
                 const acc = tx.account || 'tabungan1';
                 const delta = (tx.type === 'income' ? tx.amount : -tx.amount);
@@ -550,7 +542,6 @@
             document.getElementById('balBankMAS').setAttribute('data-value', bal2);
             document.getElementById('balInvestasi').setAttribute('data-value', balInv);
 
-            // Filter Berdasarkan Akun & Periode
             let filteredData = transactions.filter(tx => {
                 const acc = tx.account || 'tabungan1';
                 if (currentAccountFilter === 'all') return true;
@@ -632,7 +623,7 @@
 
             categoryChartInstance = new Chart(ctx2, {
                 type: 'doughnut',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3b82f6', '#f59e0b', '#a855f7', '#ef4444', '#06b6d4'] }] },
+                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3b82f6', '#f59e0b', '#a855f7', '#ef4444', '#06b6d4', '#6366f1', '#64748b'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }

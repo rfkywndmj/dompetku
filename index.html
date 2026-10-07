@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <button onclick="loadTransactionsFromSheets()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700" title="Refresh Data Sheets">
+                    <button onclick="loadTransactionsFromSheets()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700" title="Sinkronkan Data">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
                     <button id="btnOpenModal" class="flex items-center gap-2 bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition shadow-sm hover:shadow-sky-900/20 active:scale-95">
@@ -226,7 +226,7 @@
                         </tr>
                     </thead>
                     <tbody id="transactionList" class="divide-y divide-slate-700/50">
-                        <!-- Transaksi akan dimuat secara dinamis via JS -->
+                        <!-- Transaksi dimuat secara dinamis -->
                     </tbody>
                 </table>
             </div>
@@ -256,7 +256,6 @@
             </div>
 
             <form id="transactionForm" class="p-5 space-y-4">
-                <!-- Tipe Transaksi (Segment Control) -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1.5">Tipe Transaksi</label>
                     <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900/80 border border-slate-700/80 rounded-xl text-xs font-semibold">
@@ -275,13 +274,11 @@
                     </div>
                 </div>
 
-                <!-- Deskripsi / Judul -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi / Judul</label>
                     <input type="text" id="txTitle" required placeholder="Contoh: Gaji Bulanan, Beli Makan Siang" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500">
                 </div>
 
-                <!-- Nominal -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nominal (Rp)</label>
                     <div class="relative">
@@ -290,7 +287,6 @@
                     </div>
                 </div>
 
-                <!-- Kategori & Tanggal -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Kategori</label>
@@ -310,7 +306,6 @@
                     </div>
                 </div>
 
-                <!-- Modal Actions -->
                 <div class="pt-2 flex justify-end gap-2">
                     <button type="button" id="btnCancelModal" class="px-4 py-2 border border-slate-700 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-700 transition">Batal</button>
                     <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold transition shadow-sm">Simpan Transaksi</button>
@@ -319,7 +314,7 @@
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus / Reset -->
+    <!-- Modal Konfirmasi -->
     <div id="confirmModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all duration-200">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 text-center">
             <div class="w-12 h-12 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-full flex items-center justify-center mx-auto">
@@ -336,19 +331,17 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 border border-slate-700 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-2xl translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
         <span id="toastMessage">Pesan Notifikasi</span>
     </div>
 
     <script>
-        // URL Google Apps Script milikmu
-        const GOOGLE_SCRIPT_URL = 'hhttps://script.google.com/macros/s/AKfycby3tvXgLUCSrorS7lIK_NZOQ-e07B3vaUB1yLgEJzH3VfGOjgm5ksAUAfVVP582K-PP/exec';
+        // URL Google Apps Script yang sudah aktif & valid
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVpwe5aBw7obeJyhcSG4mQA2vqA9YSF5M-sLb0hfMR_G6hpBg_iBRmSUYSFnEDg8Px/exec';
 
-        // State Transaksi & Filter
         let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
-
         let currentPeriodFilter = 'all';
         let financialChartInstance = null;
         let categoryChartInstance = null;
@@ -371,11 +364,12 @@
             setupEventListeners();
             initCharts();
             renderDashboard();
-            loadTransactionsFromSheets(); // Ambil data terbaru dari Google Sheets saat dibuka
+            loadTransactionsFromSheets(); // Ambil data langsung dari Google Sheets
         });
 
+        // Ambil data otomatis dari Google Sheets
         async function loadTransactionsFromSheets() {
-            showToast('Memuat data dari Google Sheets...');
+            showToast('Menyinkronkan data dari Google Sheets...');
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await response.json();
@@ -383,10 +377,10 @@
                     transactions = data;
                     saveTransactions();
                     renderDashboard();
-                    showToast('Data berhasil disinkronkan!');
+                    showToast('Data berhasil diperbarui!');
                 }
             } catch (error) {
-                console.error("Gagal memuat dari Google Sheets:", error);
+                console.error("Gagal sinkron:", error);
                 renderDashboard();
             }
         }
@@ -439,28 +433,27 @@
                     date
                 };
 
-                // 1. Simpan ke Browser Lokal
+                // Update UI lokal
                 transactions.unshift(newTx);
                 saveTransactions();
                 renderDashboard();
                 closeModal();
-                showToast('Menyimpan data...');
+                showToast('Menyimpan ke Google Sheets...');
 
-                // 2. Kirim data ke Google Sheets
+                // Kirim data ke Google Sheets tanpa error CORS
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'add', ...newTx })
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(newTx)
                     });
                     showToast('Berhasil disimpan di Google Sheets!');
                 } catch (error) {
-                    console.error(error);
-                    showToast('Gagal mengirim ke Google Sheets!');
+                    console.error("Gagal mengirim:", error);
+                    showToast('Gagal terhubung ke Google Sheets!');
                 }
 
-                // Reset Form
                 e.target.reset();
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             });
@@ -478,16 +471,6 @@
                     e.target.classList.remove('hover:text-white');
 
                     currentPeriodFilter = e.target.getAttribute('data-period');
-                    
-                    const labels = {
-                        all: 'Semua Transaksi',
-                        daily: 'Hari Ini',
-                        weekly: '7 Hari Terakhir',
-                        monthly: 'Bulan Ini',
-                        yearly: 'Tahun Ini'
-                    };
-                    document.getElementById('chartPeriodLabel').textContent = labels[currentPeriodFilter];
-
                     renderDashboard();
                 });
             });
@@ -540,17 +523,14 @@
 
             return data.filter(tx => {
                 const txDate = new Date(tx.date);
-                if (period === 'daily') {
-                    return tx.date === todayStr;
-                } else if (period === 'weekly') {
+                if (period === 'daily') return tx.date === todayStr;
+                if (period === 'weekly') {
                     const sevenDaysAgo = new Date();
                     sevenDaysAgo.setDate(now.getDate() - 7);
                     return txDate >= sevenDaysAgo && txDate <= now;
-                } else if (period === 'monthly') {
-                    return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
-                } else if (period === 'yearly') {
-                    return txDate.getFullYear() === now.getFullYear();
                 }
+                if (period === 'monthly') return txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+                if (period === 'yearly') return txDate.getFullYear() === now.getFullYear();
                 return true;
             });
         }
@@ -641,7 +621,7 @@
             transactions = transactions.filter(t => t.id !== id);
             saveTransactions();
             renderDashboard();
-            showToast('Transaksi berhasil dihapus');
+            showToast('Transaksi dihapus dari browser.');
         }
 
         function formatDateDisplay(dateStr) {
@@ -675,24 +655,17 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: {
                             beginAtZero: true,
                             grid: { color: '#334155' },
                             ticks: {
                                 color: '#94a3b8',
-                                callback: function(value) {
-                                    return 'Rp ' + (value / 1000).toLocaleString('id-ID') + 'k';
-                                }
+                                callback: function(value) { return 'Rp ' + (value / 1000).toLocaleString('id-ID') + 'k'; }
                             }
                         },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8' }
-                        }
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
                     }
                 }
             });
@@ -712,10 +685,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { boxWidth: 12, font: { size: 11 }, color: '#cbd5e1' }
-                        }
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 }, color: '#cbd5e1' } }
                     },
                     cutout: '70%'
                 }
@@ -803,7 +773,7 @@
         function promptResetData() {
             openConfirmModal(
                 'Reset Semua Data',
-                'Apakah Anda yakin ingin menghapus SELURUH data transaksi? Tindakan ini tidak dapat dibatalkan.',
+                'Apakah Anda yakin ingin menghapus SELURUH data transaksi di browser?',
                 resetData
             );
         }
@@ -812,7 +782,7 @@
             transactions = [];
             saveTransactions();
             renderDashboard();
-            showToast('Seluruh data berhasil dihapus.');
+            showToast('Seluruh data di browser berhasil dihapus.');
         }
     </script>
 </body>

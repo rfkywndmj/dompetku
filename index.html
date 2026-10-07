@@ -2,12 +2,20 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DompetKu - Dashboard Keuangan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DompetKu - Financial Hub</title>
+    
+    <!-- Meta iOS / PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DompetKu">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2953/2953361.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -19,27 +27,38 @@
         }
     </script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        
+        /* Smooth Slide-up Bottom Sheet iOS */
+        .bottom-sheet {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+        }
+        .bottom-sheet.hidden-sheet {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col pb-20 sm:pb-0">
 
-    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30">
+    <!-- Header Navbar -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 pt-safe">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-3">
-                    <div class="p-2.5 bg-gradient-to-tr from-sky-500 to-indigo-600 text-white rounded-xl shadow-md">
-                        <i data-lucide="wallet" class="w-6 h-6"></i>
+                    <div class="p-2 bg-gradient-to-tr from-sky-500 to-indigo-600 text-white rounded-xl shadow-md">
+                        <i data-lucide="wallet" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-lg text-white leading-tight">DompetKu</h1>
-                        <p class="text-xs text-slate-400 font-medium">Dashboard Financial Hub</p>
+                        <h1 class="font-bold text-base sm:text-lg text-white leading-tight">DompetKu</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Financial Hub</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-3">
                     <button onclick="togglePrivacyMode()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700 flex items-center gap-1.5 text-xs font-semibold">
                         <i id="privacyIcon" data-lucide="eye-off" class="w-4 h-4 text-amber-400"></i>
                         <span class="hidden sm:inline" id="privacyText">Sensor Saldo</span>
@@ -48,18 +67,18 @@
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
 
-                    <button id="btnOpenTransferModal" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
+                    <button id="btnOpenTransferModal" class="hidden sm:flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
                         <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">Transfer Dana</span>
+                        <span>Transfer Dana</span>
                     </button>
-                    <button id="btnOpenModal" class="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
+                    <button id="btnOpenModal" class="hidden sm:flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
                         <i data-lucide="plus" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">Tambah Transaksi</span>
+                        <span>Tambah Transaksi</span>
                     </button>
 
                     <div class="relative group">
                         <button class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700">
-                            <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                            <i data-lucide="more-vertical" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                         </button>
                         <div class="absolute right-0 top-full mt-1 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-40 py-1">
                             <button onclick="promptResetData()" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-950/40 flex items-center gap-2">
@@ -72,18 +91,18 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 w-full flex-1">
         
         <!-- Filter Akun & Filter Periode -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="mb-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div class="inline-flex p-1 bg-slate-800 border border-slate-700/80 rounded-2xl gap-1 overflow-x-auto max-w-full">
-                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap" data-account="all">Semua Akun</button>
-                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Mandiri</button>
-                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan2">Bank MAS</button>
-                <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="investasi">Dana Investasi</button>
+                <button class="account-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap" data-account="all">Semua Akun</button>
+                <button class="account-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Mandiri</button>
+                <button class="account-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan2">Bank MAS</button>
+                <button class="account-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="investasi">Dana Investasi</button>
             </div>
 
-            <div class="inline-flex p-1 bg-slate-800/80 border border-slate-700/60 rounded-2xl gap-1 text-xs font-semibold text-slate-400 overflow-x-auto max-w-full">
+            <div class="inline-flex p-1 bg-slate-800/80 border border-slate-700/60 rounded-2xl gap-1 text-xs font-semibold text-slate-400 overflow-x-auto max-w-full justify-between">
                 <button class="period-btn px-3 py-1.5 rounded-xl transition active-period bg-slate-700 text-white shadow-sm whitespace-nowrap" data-period="all">Semua</button>
                 <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="daily">Harian</button>
                 <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="weekly">Mingguan</button>
@@ -93,81 +112,81 @@
         </div>
 
         <!-- Kartu Saldo Terpisah -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-slate-900 to-sky-950 border border-sky-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
-                <div class="flex justify-between items-start mb-2">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-5">
+            <div class="bg-gradient-to-br from-slate-900 to-sky-950 border border-sky-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden">
+                <div class="flex justify-between items-start mb-1">
                     <span class="text-xs font-semibold text-sky-300">Mandiri</span>
                     <div class="p-1.5 bg-sky-500/20 text-sky-400 rounded-lg"><i data-lucide="credit-card" class="w-4 h-4"></i></div>
                 </div>
-                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balMandiri">••••••••</div>
-                <span class="text-[11px] text-slate-400">Rekening Utama</span>
+                <div class="text-xl sm:text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balMandiri">••••••••</div>
+                <span class="text-[10px] sm:text-[11px] text-slate-400">Rekening Utama</span>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
-                <div class="flex justify-between items-start mb-2">
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden">
+                <div class="flex justify-between items-start mb-1">
                     <span class="text-xs font-semibold text-indigo-300">Bank MAS</span>
                     <div class="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg"><i data-lucide="landmark" class="w-4 h-4"></i></div>
                 </div>
-                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balBankMAS">••••••••</div>
-                <span class="text-[11px] text-slate-400">Rekening Sekunder</span>
+                <div class="text-xl sm:text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balBankMAS">••••••••</div>
+                <span class="text-[10px] sm:text-[11px] text-slate-400">Rekening Sekunder</span>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-emerald-950 border border-emerald-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
-                <div class="flex justify-between items-start mb-2">
+            <div class="bg-gradient-to-br from-slate-900 to-emerald-950 border border-emerald-500/30 rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden">
+                <div class="flex justify-between items-start mb-1">
                     <span class="text-xs font-semibold text-emerald-300">Dana Investasi</span>
                     <div class="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
                 </div>
-                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balInvestasi">••••••••</div>
-                <span class="text-[11px] text-slate-400">Portofolio Reksadana / Saham</span>
+                <div class="text-xl sm:text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balInvestasi">••••••••</div>
+                <span class="text-[10px] sm:text-[11px] text-slate-400">Portofolio Reksadana / Saham</span>
             </div>
         </div>
 
         <!-- Ringkasan Arus Kas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 flex justify-between items-center">
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-5">
+            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-3.5 sm:p-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-medium text-slate-400">Total Pemasukan (Filter)</span>
-                    <div class="text-xl font-bold text-white balance-field" data-value="0" id="totalIncome">••••••••</div>
+                    <span class="text-[10px] sm:text-xs font-medium text-slate-400 block">Pemasukan</span>
+                    <div class="text-sm sm:text-xl font-bold text-white balance-field" data-value="0" id="totalIncome">••••••••</div>
                 </div>
-                <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="arrow-down-left" class="w-5 h-5"></i></div>
+                <div class="p-1.5 sm:p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="arrow-down-left" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
             </div>
 
-            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 flex justify-between items-center">
+            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-3.5 sm:p-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-medium text-slate-400">Total Pengeluaran (Filter)</span>
-                    <div class="text-xl font-bold text-white balance-field" data-value="0" id="totalExpense">••••••••</div>
+                    <span class="text-[10px] sm:text-xs font-medium text-slate-400 block">Pengeluaran</span>
+                    <div class="text-sm sm:text-xl font-bold text-white balance-field" data-value="0" id="totalExpense">••••••••</div>
                 </div>
-                <div class="p-2 bg-rose-500/10 text-rose-400 rounded-xl"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
+                <div class="p-1.5 sm:p-2 bg-rose-500/10 text-rose-400 rounded-xl"><i data-lucide="arrow-up-right" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="lg:col-span-2 bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5">
-                <h3 class="font-bold text-white text-base mb-4">Grafik Arus Kas</h3>
-                <div class="h-64 w-full relative"><canvas id="financialChart"></canvas></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+            <div class="lg:col-span-2 bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 sm:p-5">
+                <h3 class="font-bold text-white text-sm sm:text-base mb-3">Grafik Arus Kas</h3>
+                <div class="h-48 sm:h-64 w-full relative"><canvas id="financialChart"></canvas></div>
             </div>
-            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-5 flex flex-col">
-                <h3 class="font-bold text-white text-base mb-4">Pengeluaran per Kategori</h3>
-                <div class="h-64 w-full flex-1 relative flex items-center justify-center"><canvas id="categoryChart"></canvas></div>
+            <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 sm:p-5 flex flex-col">
+                <h3 class="font-bold text-white text-sm sm:text-base mb-3">Pengeluaran per Kategori</h3>
+                <div class="h-48 sm:h-64 w-full flex-1 relative flex items-center justify-center"><canvas id="categoryChart"></canvas></div>
             </div>
         </div>
 
         <!-- Tabel Riwayat -->
         <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl overflow-hidden">
-            <div class="p-5 border-b border-slate-700/80 flex justify-between items-center">
-                <h3 class="font-bold text-white text-base">Riwayat Transaksi</h3>
+            <div class="p-4 sm:p-5 border-b border-slate-700/80 flex justify-between items-center">
+                <h3 class="font-bold text-white text-sm sm:text-base">Riwayat Transaksi</h3>
                 <span class="text-xs text-slate-400" id="txCountLabel">0 transaksi</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
-                        <tr class="bg-slate-900/50 border-b border-slate-700/80 text-slate-400 font-semibold uppercase text-[11px]">
-                            <th class="py-3 px-4">Tanggal</th>
-                            <th class="py-3 px-4">Akun</th>
-                            <th class="py-3 px-4">Deskripsi</th>
-                            <th class="py-3 px-4">Kategori</th>
-                            <th class="py-3 px-4 text-right">Nominal</th>
-                            <th class="py-3 px-4 text-center">Aksi</th>
+                        <tr class="bg-slate-900/50 border-b border-slate-700/80 text-slate-400 font-semibold uppercase text-[10px] sm:text-[11px]">
+                            <th class="py-2.5 px-3 sm:px-4">Tanggal</th>
+                            <th class="py-2.5 px-3 sm:px-4">Akun</th>
+                            <th class="py-2.5 px-3 sm:px-4">Deskripsi</th>
+                            <th class="py-2.5 px-3 sm:px-4">Kategori</th>
+                            <th class="py-2.5 px-3 sm:px-4 text-right">Nominal</th>
+                            <th class="py-2.5 px-3 sm:px-4 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="transactionList" class="divide-y divide-slate-700/50"></tbody>
@@ -176,12 +195,26 @@
         </div>
     </main>
 
-    <!-- MODUL 1: Modal Form Transaksi Biasa -->
-    <div id="transactionModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-white">Tambah Transaksi Baru</h3>
-                <button id="btnCloseModal" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <!-- FLOATING ACTION BUTTON (KHUSUS MOBILE IPHONE) -->
+    <div class="fixed bottom-6 right-5 sm:hidden z-40 flex flex-col gap-2.5 items-end">
+        <button id="btnMobileTransfer" class="flex items-center gap-2 bg-indigo-600 active:bg-indigo-500 text-white p-3 rounded-full shadow-lg shadow-indigo-600/30 border border-indigo-400/30 active:scale-95 transition-transform">
+            <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+        </button>
+        <button id="btnMobileQuickAdd" class="flex items-center gap-2 bg-sky-500 active:bg-sky-400 text-white px-4 py-3 rounded-full shadow-xl shadow-sky-500/30 border border-sky-300/30 font-bold text-xs active:scale-95 transition-transform">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            <span>Transaksi</span>
+        </button>
+    </div>
+
+    <!-- MODUL 1: Modal Transaksi (Desktop Dialog / Mobile Bottom Sheet) -->
+    <div id="transactionModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 opacity-0 invisible transition-all duration-300">
+        <div class="bottom-sheet hidden-sheet bg-slate-800 border-t sm:border border-slate-700 rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 space-y-3.5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <!-- Handle Drag Visual Mobile -->
+            <div class="w-12 h-1 bg-slate-600 rounded-full mx-auto sm:hidden mb-1"></div>
+            
+            <div class="flex justify-between items-center border-b border-slate-700/80 pb-2.5">
+                <h3 class="font-bold text-white text-sm sm:text-base">Tambah Transaksi Baru</h3>
+                <button id="btnCloseModal" class="p-1 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
             <form id="transactionForm" class="space-y-3">
@@ -189,19 +222,19 @@
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Tipe Transaksi</label>
                     <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-xl text-xs font-semibold">
                         <label class="cursor-pointer">
-                            <input type="radio" name="type" value="income" class="peer hidden" checked>
-                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-emerald-400">Pemasukan</div>
+                            <input type="radio" name="type" value="income" class="peer hidden">
+                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-emerald-400 transition">Pemasukan</div>
                         </label>
                         <label class="cursor-pointer">
-                            <input type="radio" name="type" value="expense" class="peer hidden">
-                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-rose-400">Pengeluaran</div>
+                            <input type="radio" name="type" value="expense" class="peer hidden" checked>
+                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-rose-400 transition">Pengeluaran</div>
                         </label>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Akun</label>
-                    <select id="txAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
+                    <select id="txAccount" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500 text-base sm:text-xs">
                         <option value="tabungan1">Mandiri</option>
                         <option value="tabungan2">Bank MAS</option>
                         <option value="investasi">Dana Investasi</option>
@@ -209,21 +242,29 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi</label>
-                    <input type="text" id="txTitle" required placeholder="Contoh: Gaji Bulanan, Beli Makan" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi / Catatan</label>
+                    <input type="text" id="txTitle" required placeholder="Contoh: Kopi, Bensin, Makan Siang" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-sky-500 text-base sm:text-xs">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nominal (Rp)</label>
-                    <input type="text" id="txAmount" required placeholder="0" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-bold">
+                    <input type="text" id="txAmount" required placeholder="0" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sky-400 font-extrabold text-lg sm:text-base focus:ring-2 focus:ring-sky-500">
+                    
+                    <!-- Shortcut Pecahan Uang Cepat -->
+                    <div class="flex gap-1.5 mt-2 overflow-x-auto pb-1">
+                        <button type="button" onclick="addAmountShortcut('txAmount', 10000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+10rb</button>
+                        <button type="button" onclick="addAmountShortcut('txAmount', 20000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+20rb</button>
+                        <button type="button" onclick="addAmountShortcut('txAmount', 50000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+50rb</button>
+                        <button type="button" onclick="addAmountShortcut('txAmount', 100000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+100rb</button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Kategori</label>
-                        <select id="txCategory" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
-                            <option value="gaji">Gaji / Income</option>
+                        <select id="txCategory" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white text-base sm:text-xs">
                             <option value="makanan">Makan / Minum</option>
+                            <option value="gaji">Gaji / Income</option>
                             <option value="hiburan">Hiburan</option>
                             <option value="tagihan">Tagihan</option>
                             <option value="investasi">Investasi / Tabungan</option>
@@ -233,42 +274,44 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Tanggal</label>
-                        <input type="date" id="txDate" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                        <input type="date" id="txDate" required class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white text-base sm:text-xs">
                     </div>
                 </div>
 
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" id="btnCancelModal" class="px-4 py-2 border border-slate-700 rounded-xl text-xs text-slate-300">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-sky-600 text-white rounded-xl text-xs font-semibold">Simpan Transaksi</button>
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" id="btnCancelModal" class="w-1/2 sm:w-auto px-4 py-2.5 border border-slate-700 rounded-xl text-xs font-semibold text-slate-300 active:bg-slate-700">Batal</button>
+                    <button type="submit" class="w-1/2 sm:w-auto px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold active:scale-95 transition">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODUL 2: Modal Form Transfer / Pemindahan Dana (Terpisah Penuh) -->
-    <div id="transferModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-white flex items-center gap-2">
+    <!-- MODUL 2: Modal Transfer Dana (Desktop Dialog / Mobile Bottom Sheet) -->
+    <div id="transferModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 opacity-0 invisible transition-all duration-300">
+        <div class="bottom-sheet hidden-sheet bg-slate-800 border-t sm:border border-slate-700 rounded-t-3xl sm:rounded-2xl max-w-md w-full p-5 space-y-3.5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="w-12 h-1 bg-slate-600 rounded-full mx-auto sm:hidden mb-1"></div>
+            
+            <div class="flex justify-between items-center border-b border-slate-700/80 pb-2.5">
+                <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
                     <i data-lucide="arrow-left-right" class="w-4 h-4 text-indigo-400"></i>
                     Pemindahan Dana Antar Akun
                 </h3>
-                <button id="btnCloseTransferModal" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button id="btnCloseTransferModal" class="p-1 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
             <form id="transferForm" class="space-y-3">
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Dari Akun (Sumber)</label>
-                        <select id="tfFromAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Dari Akun</label>
+                        <select id="tfFromAccount" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white text-base sm:text-xs">
                             <option value="tabungan1">Mandiri</option>
                             <option value="tabungan2">Bank MAS</option>
                             <option value="investasi">Dana Investasi</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Ke Akun (Tujuan)</label>
-                        <select id="tfToAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Ke Akun</label>
+                        <select id="tfToAccount" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white text-base sm:text-xs">
                             <option value="tabungan2">Bank MAS</option>
                             <option value="tabungan1">Mandiri</option>
                             <option value="investasi">Dana Investasi</option>
@@ -278,28 +321,35 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Catatan Pemindahan</label>
-                    <input type="text" id="tfTitle" placeholder="Contoh: Topup Investasi, Alokasi Bulanan" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="text" id="tfTitle" placeholder="Contoh: Topup Investasi, Alokasi Bulanan" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-base sm:text-xs">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Nominal Transfer (Rp)</label>
-                    <input type="text" id="tfAmount" required placeholder="0" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-bold">
+                    <input type="text" id="tfAmount" required placeholder="0" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-indigo-400 font-extrabold text-lg sm:text-base focus:ring-2 focus:ring-indigo-500">
+                    
+                    <div class="flex gap-1.5 mt-2 overflow-x-auto pb-1">
+                        <button type="button" onclick="addAmountShortcut('tfAmount', 50000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+50rb</button>
+                        <button type="button" onclick="addAmountShortcut('tfAmount', 100000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+100rb</button>
+                        <button type="button" onclick="addAmountShortcut('tfAmount', 500000)" class="px-2.5 py-1 bg-slate-700/60 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg whitespace-nowrap">+500rb</button>
+                    </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Tanggal</label>
-                    <input type="date" id="tfDate" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="date" id="tfDate" required class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white text-base sm:text-xs">
                 </div>
 
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" id="btnCancelTransferModal" class="px-4 py-2 border border-slate-700 rounded-xl text-xs text-slate-300">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold">Proses Transfer</button>
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" id="btnCancelTransferModal" class="w-1/2 sm:w-auto px-4 py-2.5 border border-slate-700 rounded-xl text-xs font-semibold text-slate-300 active:bg-slate-700">Batal</button>
+                    <button type="submit" class="w-1/2 sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold active:scale-95 transition">Proses Transfer</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 border border-slate-700 text-white text-xs px-4 py-3 rounded-xl shadow-2xl translate-y-20 opacity-0 transition-all z-50">
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-20 sm:bottom-5 right-5 bg-slate-800 border border-slate-700 text-white text-xs px-4 py-3 rounded-xl shadow-2xl translate-y-20 opacity-0 transition-all z-50">
         <span id="toastMessage">Notifikasi</span>
     </div>
 
@@ -340,17 +390,41 @@
             }
         }
 
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const sheet = modal.querySelector('.bottom-sheet');
+            modal.classList.remove('invisible', 'opacity-0');
+            setTimeout(() => sheet.classList.remove('hidden-sheet'), 10);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            const sheet = modal.querySelector('.bottom-sheet');
+            sheet.classList.add('hidden-sheet');
+            setTimeout(() => modal.classList.add('opacity-0', 'invisible'), 250);
+        }
+
+        function addAmountShortcut(inputId, valToAdd) {
+            const input = document.getElementById(inputId);
+            let currentVal = parseInt(input.value.replace(/[^0-9]/g, ''), 10) || 0;
+            currentVal += valToAdd;
+            input.value = currentVal.toLocaleString('id-ID');
+        }
+
         function setupEventListeners() {
-            const txModal = document.getElementById('transactionModal');
-            document.getElementById('btnOpenModal').addEventListener('click', () => txModal.classList.remove('invisible', 'opacity-0'));
-            document.getElementById('btnCloseModal').addEventListener('click', () => txModal.classList.add('opacity-0', 'invisible'));
-            document.getElementById('btnCancelModal').addEventListener('click', () => txModal.classList.add('opacity-0', 'invisible'));
+            // Event Buka/Tutup Modal Transaksi
+            document.getElementById('btnOpenModal').addEventListener('click', () => openModal('transactionModal'));
+            document.getElementById('btnMobileQuickAdd').addEventListener('click', () => openModal('transactionModal'));
+            document.getElementById('btnCloseModal').addEventListener('click', () => closeModal('transactionModal'));
+            document.getElementById('btnCancelModal').addEventListener('click', () => closeModal('transactionModal'));
 
-            const tfModal = document.getElementById('transferModal');
-            document.getElementById('btnOpenTransferModal').addEventListener('click', () => tfModal.classList.remove('invisible', 'opacity-0'));
-            document.getElementById('btnCloseTransferModal').addEventListener('click', () => tfModal.classList.add('opacity-0', 'invisible'));
-            document.getElementById('btnCancelTransferModal').addEventListener('click', () => tfModal.classList.add('opacity-0', 'invisible'));
+            // Event Buka/Tutup Modal Transfer
+            document.getElementById('btnOpenTransferModal').addEventListener('click', () => openModal('transferModal'));
+            document.getElementById('btnMobileTransfer').addEventListener('click', () => openModal('transferModal'));
+            document.getElementById('btnCloseTransferModal').addEventListener('click', () => closeModal('transferModal'));
+            document.getElementById('btnCancelTransferModal').addEventListener('click', () => closeModal('transferModal'));
 
+            // Format Ribuan Input
             ['txAmount', 'tfAmount'].forEach(id => {
                 document.getElementById(id).addEventListener('input', (e) => {
                     let val = e.target.value.replace(/[^0-9]/g, '');
@@ -358,6 +432,7 @@
                 });
             });
 
+            // Submit Transaksi Biasa
             document.getElementById('transactionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const title = document.getElementById('txTitle').value.trim();
@@ -374,7 +449,7 @@
                 transactions.unshift(newTx);
                 saveTransactions();
                 renderDashboard();
-                txModal.classList.add('opacity-0', 'invisible');
+                closeModal('transactionModal');
                 showToast('Menyimpan ke Sheets...');
 
                 try {
@@ -391,6 +466,7 @@
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             });
 
+            // Submit Transfer Dana
             document.getElementById('transferForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const fromAcc = document.getElementById('tfFromAccount').value;
@@ -414,7 +490,7 @@
                 transactions.unshift(...newTxs);
                 saveTransactions();
                 renderDashboard();
-                tfModal.classList.add('opacity-0', 'invisible');
+                closeModal('transferModal');
                 showToast('Memproses Transfer...');
 
                 try {
@@ -431,6 +507,7 @@
                 document.getElementById('tfDate').value = new Date().toISOString().split('T')[0];
             });
 
+            // Filter Tabungan
             document.querySelectorAll('.account-tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.account-tab-btn').forEach(b => b.classList.replace('bg-sky-600', 'text-slate-400'));
@@ -441,6 +518,7 @@
                 });
             });
 
+            // Filter Periode
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('bg-slate-700', 'text-white', 'shadow-sm'));
@@ -524,7 +602,6 @@
         function renderDashboard() {
             let bal1 = 0, bal2 = 0, balInv = 0;
 
-            // 1. Saldo Kartu Mandiri (Semua transaksi termasuk transfer dihitung untuk saldo akun)
             transactions.forEach(tx => {
                 const acc = tx.account || 'tabungan1';
                 const delta = (tx.type === 'income' ? tx.amount : -tx.amount);
@@ -538,7 +615,6 @@
             document.getElementById('balBankMAS').setAttribute('data-value', bal2);
             document.getElementById('balInvestasi').setAttribute('data-value', balInv);
 
-            // 2. Filter Berdasarkan Akun & Periode
             let filteredData = transactions.filter(tx => {
                 const acc = tx.account || 'tabungan1';
                 if (currentAccountFilter === 'all') return true;
@@ -547,14 +623,9 @@
 
             filteredData = filterByPeriod(filteredData, currentPeriodFilter);
 
-            // 3. Hitung Pemasukan & Pengeluaran Ringkasan (TRANSFER DI-EXCLUDE JIKA PILIH 'SEMUA AKUN')
             let income = 0, expense = 0;
             filteredData.forEach(tx => {
-                // Jangan hitung kategori 'transfer' sebagai pemasukan/pengeluaran jika dalam tampilan Semua Akun
-                if (currentAccountFilter === 'all' && tx.category === 'transfer') {
-                    return; 
-                }
-
+                if (currentAccountFilter === 'all' && tx.category === 'transfer') return;
                 if (tx.type === 'income') income += tx.amount;
                 else expense += tx.amount;
             });
@@ -591,14 +662,14 @@
 
                 return `
                     <tr class="hover:bg-slate-700/30 border-b border-slate-800">
-                        <td class="py-3 px-4 text-slate-400">${tx.date}</td>
-                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${accBadge}">${accName}</span></td>
-                        <td class="py-3 px-4 font-semibold text-slate-200">${tx.title}</td>
-                        <td class="py-3 px-4 text-slate-400 capitalize">${tx.category}</td>
-                        <td class="py-3 px-4 text-right font-bold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">
+                        <td class="py-2.5 px-3 sm:px-4 text-slate-400 whitespace-nowrap">${tx.date}</td>
+                        <td class="py-2.5 px-3 sm:px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${accBadge}">${accName}</span></td>
+                        <td class="py-2.5 px-3 sm:px-4 font-semibold text-slate-200">${tx.title}</td>
+                        <td class="py-2.5 px-3 sm:px-4 text-slate-400 capitalize">${tx.category}</td>
+                        <td class="py-2.5 px-3 sm:px-4 text-right font-bold whitespace-nowrap ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">
                             ${isIncome ? '+' : '-'} ${formatIDR(tx.amount)}
                         </td>
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-2.5 px-3 sm:px-4 text-center">
                             <button onclick="deleteTx(${tx.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
                     </tr>
@@ -635,11 +706,7 @@
             let inc = 0, exp = 0;
             const catSums = {};
             data.forEach(tx => {
-                // Abaikan transaksi transfer dari grafik arus kas jika di tampilan Semua Akun
-                if (currentAccountFilter === 'all' && tx.category === 'transfer') {
-                    return;
-                }
-
+                if (currentAccountFilter === 'all' && tx.category === 'transfer') return;
                 if (tx.type === 'income') inc += tx.amount;
                 else {
                     exp += tx.amount;

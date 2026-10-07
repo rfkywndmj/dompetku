@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DompetKu - Multi Tabungan & Sensor Saldo</title>
+    <title>DompetKu - Financial Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -40,7 +40,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <!-- Tombol Sensor Global -->
                     <button onclick="togglePrivacyMode()" class="p-2 text-slate-300 hover:bg-slate-800 rounded-xl transition border border-slate-700 flex items-center gap-1.5 text-xs font-semibold" title="Sembunyikan/Tampilkan Saldo">
                         <i id="privacyIcon" data-lucide="eye-off" class="w-4 h-4 text-amber-400"></i>
                         <span class="hidden sm:inline" id="privacyText">Sensor Saldo</span>
@@ -73,36 +72,36 @@
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div class="inline-flex p-1 bg-slate-800 border border-slate-700/80 rounded-2xl gap-1 overflow-x-auto max-w-full">
                 <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap" data-account="all">Semua Akun</button>
-                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Tabungan 1 (Utama)</button>
-                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan2">Tabungan 2 (Sekunder)</button>
+                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Mandiri</button>
+                <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan2">Bank MAS</button>
                 <button class="account-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="investasi">Dana Investasi</button>
             </div>
         </div>
 
         <!-- Kartu Saldo Terpisah -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <!-- Saldo Tabungan 1 -->
+            <!-- Saldo Mandiri -->
             <div class="bg-gradient-to-br from-slate-900 to-sky-950 border border-sky-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
                 <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-semibold text-sky-300">Tabungan 1 (Utama)</span>
+                    <span class="text-xs font-semibold text-sky-300">Mandiri</span>
                     <div class="p-1.5 bg-sky-500/20 text-sky-400 rounded-lg">
+                        <i data-lucide="credit-card" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balMandiri">••••••••</div>
+                <span class="text-[11px] text-slate-400">Rekening Utama</span>
+            </div>
+
+            <!-- Saldo Bank MAS -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-semibold text-indigo-300">Bank MAS</span>
+                    <div class="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg">
                         <i data-lucide="landmark" class="w-4 h-4"></i>
                     </div>
                 </div>
-                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balTabungan1">••••••••</div>
-                <span class="text-[11px] text-slate-400">Saldo Operasional</span>
-            </div>
-
-            <!-- Saldo Tabungan 2 -->
-            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 border border-indigo-500/30 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-semibold text-indigo-300">Tabungan 2 (Sekunder)</span>
-                    <div class="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg">
-                        <i data-lucide="piggy-bank" class="w-4 h-4"></i>
-                    </div>
-                </div>
-                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balTabungan2">••••••••</div>
-                <span class="text-[11px] text-slate-400">Dana Impian / Cadangan</span>
+                <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balBankMAS">••••••••</div>
+                <span class="text-[11px] text-slate-400">Rekening Sekunder</span>
             </div>
 
             <!-- Dana Investasi -->
@@ -114,7 +113,7 @@
                     </div>
                 </div>
                 <div class="text-2xl font-extrabold text-white tracking-tight my-1 balance-field" data-value="0" id="balInvestasi">••••••••</div>
-                <span class="text-[11px] text-slate-400">Portofolio & Tabungan Saham/Reksadana</span>
+                <span class="text-[11px] text-slate-400">Portofolio Reksadana / Saham</span>
             </div>
         </div>
 
@@ -122,7 +121,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-medium text-slate-400">Total Pemasukan (Filter)</span>
+                    <span class="text-xs font-medium text-slate-400">Total Pemasukan</span>
                     <div class="text-xl font-bold text-white balance-field" data-value="0" id="totalIncome">••••••••</div>
                 </div>
                 <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="arrow-down-left" class="w-5 h-5"></i></div>
@@ -130,7 +129,7 @@
 
             <div class="bg-slate-800/50 border border-slate-700/80 rounded-2xl p-4 flex justify-between items-center">
                 <div>
-                    <span class="text-xs font-medium text-slate-400">Total Pengeluaran (Filter)</span>
+                    <span class="text-xs font-medium text-slate-400">Total Pengeluaran</span>
                     <div class="text-xl font-bold text-white balance-field" data-value="0" id="totalExpense">••••••••</div>
                 </div>
                 <div class="p-2 bg-rose-500/10 text-rose-400 rounded-xl"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></div>
@@ -176,37 +175,62 @@
     <div id="transactionModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-white">Tambah Transaksi Baru</h3>
+                <h3 class="font-bold text-white">Tambah Transaksi / Pindah Saldo</h3>
                 <button id="btnCloseModal" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
             <form id="transactionForm" class="space-y-3">
                 <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Tipe Transaksi</label>
+                    <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-900 rounded-xl text-xs font-semibold">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="type" value="income" class="peer hidden" checked onchange="toggleFormMode('income')">
+                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-emerald-400">Pemasukan</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="type" value="expense" class="peer hidden" onchange="toggleFormMode('expense')">
+                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-rose-400">Pengeluaran</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="type" value="transfer" class="peer hidden" onchange="toggleFormMode('transfer')">
+                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-sky-400">Transfer</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Input Sumber Akun Biasa -->
+                <div id="singleAccountContainer">
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Pilih Akun / Sumber Dana</label>
-                    <select id="txAccount" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
-                        <option value="tabungan1">Tabungan 1 (Utama)</option>
-                        <option value="tabungan2">Tabungan 2 (Sekunder)</option>
+                    <select id="txAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
+                        <option value="tabungan1">Mandiri</option>
+                        <option value="tabungan2">Bank MAS</option>
                         <option value="investasi">Dana Investasi</option>
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Tipe Transaksi</label>
-                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-xl text-xs font-semibold">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="type" value="income" class="peer hidden" checked>
-                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-emerald-400">Pemasukan</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="type" value="expense" class="peer hidden">
-                            <div class="py-2 text-center rounded-lg text-slate-400 peer-checked:bg-slate-800 peer-checked:text-rose-400">Pengeluaran</div>
-                        </label>
+                <!-- Input Pindah Saldo / Transfer -->
+                <div id="transferAccountContainer" class="hidden grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Dari Akun</label>
+                        <select id="txFromAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
+                            <option value="tabungan1">Mandiri</option>
+                            <option value="tabungan2">Bank MAS</option>
+                            <option value="investasi">Dana Investasi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Ke Akun</label>
+                        <select id="txToAccount" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-sky-500">
+                            <option value="tabungan2">Bank MAS</option>
+                            <option value="tabungan1">Mandiri</option>
+                            <option value="investasi">Dana Investasi</option>
+                        </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1">Deskripsi</label>
-                    <input type="text" id="txTitle" required placeholder="Contoh: Beli Saham, Topup Tabungan" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="text" id="txTitle" required placeholder="Contoh: Beli Kopi, Transfer Saldo" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white">
                 </div>
 
                 <div>
@@ -224,6 +248,7 @@
                             <option value="tagihan">Tagihan</option>
                             <option value="investasi">Investasi / Tabungan</option>
                             <option value="transportasi">Transportasi</option>
+                            <option value="transfer">Transfer Antar Akun</option>
                             <option value="lainnya">Lainnya</option>
                         </select>
                     </div>
@@ -250,7 +275,7 @@
 
         let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
         let currentAccountFilter = 'all';
-        let isPrivacyMode = true; // Sembunyikan saldo secara default
+        let isPrivacyMode = true;
         let financialChartInstance = null;
         let categoryChartInstance = null;
 
@@ -262,6 +287,21 @@
             renderDashboard();
             loadTransactionsFromSheets();
         });
+
+        function toggleFormMode(mode) {
+            const singleContainer = document.getElementById('singleAccountContainer');
+            const transferContainer = document.getElementById('transferAccountContainer');
+            const categorySelect = document.getElementById('txCategory');
+
+            if (mode === 'transfer') {
+                singleContainer.classList.add('hidden');
+                transferContainer.classList.remove('hidden');
+                categorySelect.value = 'transfer';
+            } else {
+                singleContainer.classList.remove('hidden');
+                transferContainer.classList.add('hidden');
+            }
+        }
 
         async function loadTransactionsFromSheets() {
             showToast('Menyinkronkan data...');
@@ -297,31 +337,54 @@
                 const amount = parseFloat(rawAmount);
                 const type = document.querySelector('input[name="type"]:checked').value;
                 const category = document.getElementById('txCategory').value;
-                const account = document.getElementById('txAccount').value;
                 const date = document.getElementById('txDate').value;
 
                 if (!title || isNaN(amount) || amount <= 0) return;
 
-                const newTx = { id: Date.now(), date, title, category, type, amount, account };
-                transactions.unshift(newTx);
+                let newTransactions = [];
+
+                if (type === 'transfer') {
+                    const fromAcc = document.getElementById('txFromAccount').value;
+                    const toAcc = document.getElementById('txToAccount').value;
+
+                    if (fromAcc === toAcc) {
+                        alert("Akun asal dan akun tujuan tidak boleh sama!");
+                        return;
+                    }
+
+                    // Transaksi 1: Pengeluaran dari Akun Asal
+                    const txOut = { id: Date.now(), date, title: `Transfer ke ${getAccountLabel(toAcc)} - ${title}`, category: 'transfer', type: 'expense', amount, account: fromAcc };
+                    // Transaksi 2: Pemasukan ke Akun Tujuan
+                    const txIn = { id: Date.now() + 1, date, title: `Transfer dari ${getAccountLabel(fromAcc)} - ${title}`, category: 'transfer', type: 'income', amount, account: toAcc };
+
+                    newTransactions.push(txOut, txIn);
+                } else {
+                    const account = document.getElementById('txAccount').value;
+                    newTransactions.push({ id: Date.now(), date, title, category, type, amount, account });
+                }
+
+                transactions.unshift(...newTransactions);
                 saveTransactions();
                 renderDashboard();
                 modal.classList.add('opacity-0', 'invisible');
                 showToast('Menyimpan ke Sheets...');
 
-                try {
-                    await fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify(newTx)
-                    });
-                    showToast('Tersimpan di Google Sheets!');
-                } catch (err) {
-                    console.error(err);
+                for (const tx of newTransactions) {
+                    try {
+                        await fetch(GOOGLE_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify(tx)
+                        });
+                    } catch (err) {
+                        console.error(err);
+                    }
                 }
+                showToast('Tersimpan di Google Sheets!');
 
                 e.target.reset();
+                toggleFormMode('income');
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             });
 
@@ -336,7 +399,13 @@
             });
         }
 
-        // Fungsi Sakelar Sensor Privacy
+        function getAccountLabel(accKey) {
+            if (accKey === 'tabungan1') return 'Mandiri';
+            if (accKey === 'tabungan2') return 'Bank MAS';
+            if (accKey === 'investasi') return 'Investasi';
+            return 'Mandiri';
+        }
+
         function togglePrivacyMode() {
             isPrivacyMode = !isPrivacyMode;
             const icon = document.getElementById('privacyIcon');
@@ -391,8 +460,8 @@
                 else if (acc === 'investasi') balInv += delta;
             });
 
-            document.getElementById('balTabungan1').setAttribute('data-value', bal1);
-            document.getElementById('balTabungan2').setAttribute('data-value', bal2);
+            document.getElementById('balMandiri').setAttribute('data-value', bal1);
+            document.getElementById('balBankMAS').setAttribute('data-value', bal2);
             document.getElementById('balInvestasi').setAttribute('data-value', balInv);
 
             let filteredData = transactions.filter(tx => {
@@ -426,11 +495,11 @@
 
             listEl.innerHTML = data.map(tx => {
                 const isIncome = tx.type === 'income';
-                let accName = 'Tabungan 1';
+                let accName = 'Mandiri';
                 let accBadge = 'bg-sky-500/10 text-sky-400';
 
                 if (tx.account === 'tabungan2') {
-                    accName = 'Tabungan 2';
+                    accName = 'Bank MAS';
                     accBadge = 'bg-indigo-500/10 text-indigo-400';
                 } else if (tx.account === 'investasi') {
                     accName = 'Investasi';

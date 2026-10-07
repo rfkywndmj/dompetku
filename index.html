@@ -338,8 +338,8 @@
     </div>
 
     <script>
-        // URL Google Apps Script yang sudah aktif & valid
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVpwe5aBw7obeJyhcSG4mQA2vqA9YSF5M-sLb0hfMR_G6hpBg_iBRmSUYSFnEDg8Px/exec';
+        // MASUKKAN WEB APP URL BARU KAMU DI SINI
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7YECKcpFR5nWCktCy4AEcJSMUZdHgHxh307Dj6Eg_oj3jwfsBCaL0NGhw0Y1lmaCavQ/exec';
 
         let transactions = JSON.parse(localStorage.getItem('dompetku_transactions')) || [];
         let currentPeriodFilter = 'all';
@@ -364,10 +364,10 @@
             setupEventListeners();
             initCharts();
             renderDashboard();
-            loadTransactionsFromSheets(); // Ambil data langsung dari Google Sheets
+            loadTransactionsFromSheets();
         });
 
-        // Ambil data otomatis dari Google Sheets
+        // Ambil data dari Google Sheets
         async function loadTransactionsFromSheets() {
             showToast('Menyinkronkan data dari Google Sheets...');
             try {
@@ -426,11 +426,11 @@
 
                 const newTx = {
                     id: Date.now(),
+                    date,
                     title,
-                    amount,
-                    type,
                     category,
-                    date
+                    type,
+                    amount
                 };
 
                 // Update UI lokal
@@ -440,7 +440,7 @@
                 closeModal();
                 showToast('Menyimpan ke Google Sheets...');
 
-                // Kirim data ke Google Sheets tanpa error CORS
+                // Kirim payload persis ke Google Sheets
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',

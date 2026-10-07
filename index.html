@@ -48,7 +48,6 @@
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
 
-                    <!-- Modul Tombol Terpisah -->
                     <button id="btnOpenTransferModal" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition shadow-sm active:scale-95">
                         <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">Transfer Dana</span>
@@ -77,7 +76,6 @@
         
         <!-- Filter Akun & Filter Periode -->
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <!-- Filter Akun -->
             <div class="inline-flex p-1 bg-slate-800 border border-slate-700/80 rounded-2xl gap-1 overflow-x-auto max-w-full">
                 <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap" data-account="all">Semua Akun</button>
                 <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="tabungan1">Mandiri</button>
@@ -85,7 +83,6 @@
                 <button class="account-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white whitespace-nowrap" data-account="investasi">Dana Investasi</button>
             </div>
 
-            <!-- Filter Periode (Lengkap) -->
             <div class="inline-flex p-1 bg-slate-800/80 border border-slate-700/60 rounded-2xl gap-1 text-xs font-semibold text-slate-400 overflow-x-auto max-w-full">
                 <button class="period-btn px-3 py-1.5 rounded-xl transition active-period bg-slate-700 text-white shadow-sm whitespace-nowrap" data-period="all">Semua</button>
                 <button class="period-btn px-3 py-1.5 rounded-xl transition hover:text-white whitespace-nowrap" data-period="daily">Harian</button>
@@ -413,7 +410,6 @@
                 const txOut = { id: Date.now(), date, title: `Transfer ke ${getAccountLabel(toAcc)}${noteStr}`, category: 'transfer', type: 'expense', amount, account: fromAcc };
                 const txIn = { id: Date.now() + 1, date, title: `Transfer dari ${getAccountLabel(fromAcc)}${noteStr}`, category: 'transfer', type: 'income', amount, account: toAcc };
 
-                // Simpan sekaligus
                 const newTxs = [txOut, txIn];
                 transactions.unshift(...newTxs);
                 saveTransactions();
@@ -422,7 +418,6 @@
                 showToast('Memproses Transfer...');
 
                 try {
-                    // Kirim sebagai ARRAY (Sangat efisien & Anti-gagal)
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -529,6 +524,7 @@
         function renderDashboard() {
             let bal1 = 0, bal2 = 0, balInv = 0;
 
+            // 1. Saldo Kartu Mandiri (Semua transaksi termasuk transfer dihitung untuk saldo akun)
             transactions.forEach(tx => {
                 const acc = tx.account || 'tabungan1';
                 const delta = (tx.type === 'income' ? tx.amount : -tx.amount);
@@ -542,6 +538,7 @@
             document.getElementById('balBankMAS').setAttribute('data-value', bal2);
             document.getElementById('balInvestasi').setAttribute('data-value', balInv);
 
+            // 2. Filter Berdasarkan Akun & Periode
             let filteredData = transactions.filter(tx => {
                 const acc = tx.account || 'tabungan1';
                 if (currentAccountFilter === 'all') return true;
@@ -550,8 +547,14 @@
 
             filteredData = filterByPeriod(filteredData, currentPeriodFilter);
 
+            // 3. Hitung Pemasukan & Pengeluaran Ringkasan (TRANSFER DI-EXCLUDE JIKA PILIH 'SEMUA AKUN')
             let income = 0, expense = 0;
             filteredData.forEach(tx => {
+                // Jangan hitung kategori 'transfer' sebagai pemasukan/pengeluaran jika dalam tampilan Semua Akun
+                if (currentAccountFilter === 'all' && tx.category === 'transfer') {
+                    return; 
+                }
+
                 if (tx.type === 'income') income += tx.amount;
                 else expense += tx.amount;
             });
@@ -632,6 +635,11 @@
             let inc = 0, exp = 0;
             const catSums = {};
             data.forEach(tx => {
+                // Abaikan transaksi transfer dari grafik arus kas jika di tampilan Semua Akun
+                if (currentAccountFilter === 'all' && tx.category === 'transfer') {
+                    return;
+                }
+
                 if (tx.type === 'income') inc += tx.amount;
                 else {
                     exp += tx.amount;
